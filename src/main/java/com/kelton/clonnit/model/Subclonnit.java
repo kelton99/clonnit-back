@@ -2,7 +2,7 @@ package com.kelton.clonnit.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -21,21 +21,22 @@ public class Subclonnit {
 	@OneToMany(fetch = FetchType.LAZY)
 	private List<Post> posts;
 
-	private LocalDateTime createdDate;
+	private Date createdDate = new Date();
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	private Clonnitor clonnitor;
+	@JoinColumn(name = "clonnitor_id", referencedColumnName = "id")
+	private Clonnitor creator;
 
 	public Subclonnit() {
 	}
 
-	public Subclonnit(Long id, String name, String description, List<Post> posts, LocalDateTime createdDate, Clonnitor clonnitor) {
+	public Subclonnit(Long id, String name, String description, List<Post> posts, Date createdDate, Clonnitor creator) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.posts = posts;
 		this.createdDate = createdDate;
-		this.clonnitor = clonnitor;
+		this.creator = creator;
 	}
 
 	public Long getId() {
@@ -70,20 +71,20 @@ public class Subclonnit {
 		this.posts = posts;
 	}
 
-	public LocalDateTime getCreatedDate() {
+	public Date getCreatedDate() {
 		return createdDate;
 	}
 
-	public void setCreatedDate(LocalDateTime createdDate) {
+	public void setCreatedDate(Date createdDate) {
 		this.createdDate = createdDate;
 	}
 
-	public Clonnitor getClonnitor() {
-		return clonnitor;
+	public Clonnitor getCreator() {
+		return creator;
 	}
 
-	public void setClonnitor(Clonnitor clonnitor) {
-		this.clonnitor = clonnitor;
+	public void setCreator(Clonnitor creator) {
+		this.creator = creator;
 	}
 
 	@Override

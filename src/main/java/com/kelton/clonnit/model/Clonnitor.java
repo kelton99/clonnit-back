@@ -14,7 +14,7 @@ public class Clonnitor {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long clonnitorId;
+	private Long id;
 
 	@NotBlank(message = "Username is required")
 	private String username;
@@ -32,8 +32,8 @@ public class Clonnitor {
 	public Clonnitor() {
 	}
 
-	public Clonnitor(Long clonnitorId, String username, String password, String email, LocalDateTime created, boolean enabled) {
-		this.clonnitorId = clonnitorId;
+	public Clonnitor(Long id, String username, String password, String email, LocalDateTime created, boolean enabled) {
+		this.id = id;
 		this.username = username;
 		this.password = password;
 		this.email = email;
@@ -41,12 +41,12 @@ public class Clonnitor {
 		this.enabled = enabled;
 	}
 
-	public Long getClonnitorId() {
-		return clonnitorId;
+	public Long getId() {
+		return id;
 	}
 
-	public void setClonnitorId(Long clonnitorId) {
-		this.clonnitorId = clonnitorId;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getUsername() {
@@ -96,11 +96,11 @@ public class Clonnitor {
 
 		Clonnitor clonnitor = (Clonnitor) o;
 
-		return clonnitorId.equals(clonnitor.clonnitorId);
+		return id.equals(clonnitor.id);
 	}
 
 	@Override
 	public int hashCode() {
-		return clonnitorId.hashCode();
+		return id.hashCode();
 	}
 }

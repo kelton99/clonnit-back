@@ -15,13 +15,13 @@ public class Comment {
 	private String text;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "postId", referencedColumnName = "postId")
+	@JoinColumn(name = "post_id", referencedColumnName = "id")
 	private Post post;
 
 	private LocalDateTime createdDate;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "clonnitorId", referencedColumnName = "clonnitorId")
+	@JoinColumn(name = "clonnitor_id", referencedColumnName = "id")
 	private Clonnitor clonnitor;
 
 	public Comment() {

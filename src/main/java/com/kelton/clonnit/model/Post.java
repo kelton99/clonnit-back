@@ -4,14 +4,16 @@ import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 public class Post {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long postId;
+	private Long id;
 
 	@NotBlank(message = "Post Name cannot be empty or Null")
 	private String postName;
@@ -23,38 +25,50 @@ public class Post {
 	@Lob
 	private String description;
 
+	@OneToMany
+	private List<Comment> comments = new ArrayList<>();
+
 	private Integer voteCount;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "clonnitorId", referencedColumnName = "clonnitorId")
+	@JoinColumn(name = "clonnitor_id", referencedColumnName = "id")
 	private Clonnitor clonnitor;
 
-	private LocalDateTime createdDate;
+	private Date createdDate = new Date();
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id", referencedColumnName = "id")
+	@JoinColumn(name = "subclonnit_id", referencedColumnName = "id")
 	private Subclonnit subclonnit;
 
 	public Post() {
 	}
 
-	public Post(Long postId, String postName, @Nullable String url, @Nullable String description, Integer voteCount, Clonnitor clonnitor, LocalDateTime createdDate, Subclonnit subclonnit) {
-		this.postId = postId;
+	public Post(Long id, String postName, @Nullable String url, @Nullable String description, List<Comment> comments, Integer voteCount, Clonnitor clonnitor, Date createdDate, Subclonnit subclonnit) {
+		this.id = id;
 		this.postName = postName;
 		this.url = url;
 		this.description = description;
+		this.comments = comments;
 		this.voteCount = voteCount;
 		this.clonnitor = clonnitor;
 		this.createdDate = createdDate;
 		this.subclonnit = subclonnit;
 	}
 
-	public Long getPostId() {
-		return postId;
+	public List<Comment> getComments() {
+		return comments;
 	}
 
-	public void setPostId(Long postId) {
-		this.postId = postId;
+	public void setComments(List<Comment> comments) {
+		this.comments = comments;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getPostName() {
@@ -99,11 +113,11 @@ public class Post {
 		this.clonnitor = clonnitor;
 	}
 
-	public LocalDateTime getCreatedDate() {
+	public Date getCreatedDate() {
 		return createdDate;
 	}
 
-	public void setCreatedDate(LocalDateTime createdDate) {
+	public void setCreatedDate(Date createdDate) {
 		this.createdDate = createdDate;
 	}
 
@@ -122,11 +136,11 @@ public class Post {
 
 		Post post = (Post) o;
 
-		return postId.equals(post.postId);
+		return id.equals(post.id);
 	}
 
 	@Override
 	public int hashCode() {
-		return postId.hashCode();
+		return id.hashCode();
 	}
 }

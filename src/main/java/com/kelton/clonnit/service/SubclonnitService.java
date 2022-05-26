@@ -20,7 +20,8 @@ public class SubclonnitService {
 
     public SubclonnitDto save(SubclonnitDto subclonnitDto) {
         Subclonnit saved = mapSubclonnitDto(subclonnitDto);
-        subclonnitDto.setId(subclonnitDto.getId());
+        subclonnitRepository.save(saved);
+        subclonnitDto.setId(saved.getId());
         return subclonnitDto;
     }
 
@@ -36,7 +37,7 @@ public class SubclonnitService {
 
     private SubclonnitDto mapToDto(Subclonnit subclonnit) {
         final SubclonnitDto subclonnitDto = new SubclonnitDto();
-        subclonnit.setId(subclonnitDto.getId());
+        subclonnitDto.setId(subclonnit.getId());
         subclonnitDto.setName(subclonnit.getName());
         subclonnitDto.setNumberOfPosts(subclonnit.getPosts().size());
         subclonnitDto.setDescription(subclonnit.getDescription());

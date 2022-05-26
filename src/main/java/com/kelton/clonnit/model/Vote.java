@@ -8,34 +8,34 @@ public class Vote {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long voteId;
+	private Long id;
 
 	private VoteType voteType;
 
 	@NotNull
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "postId", referencedColumnName = "postId")
+	@JoinColumn(name = "post_id", referencedColumnName = "id")
 	private Post post;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "clonnitorId", referencedColumnName = "clonnitorId")
+	@JoinColumn(name = "clonnitor_id", referencedColumnName = "id")
 	private Clonnitor clonnitor;
 
 	public Vote() { }
 
-	public Vote(Long voteId, VoteType voteType, Post post, Clonnitor clonnitor) {
-		this.voteId = voteId;
+	public Vote(Long id, VoteType voteType, Post post, Clonnitor clonnitor) {
+		this.id = id;
 		this.voteType = voteType;
 		this.post = post;
 		this.clonnitor = clonnitor;
 	}
 
-	public Long getVoteId() {
-		return voteId;
+	public Long getId() {
+		return id;
 	}
 
-	public void setVoteId(Long voteId) {
-		this.voteId = voteId;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public VoteType getVoteType() {
@@ -69,11 +69,11 @@ public class Vote {
 
 		Vote vote = (Vote) o;
 
-		return voteId.equals(vote.voteId);
+		return id.equals(vote.id);
 	}
 
 	@Override
 	public int hashCode() {
-		return voteId.hashCode();
+		return id.hashCode();
 	}
 }
