@@ -74,7 +74,7 @@ public class PostService {
         postResponse.setCommentCount(post.getComments().size());
         //postResponse.setDuration(TimeAgo.using(post.getCreatedDate().getTime()));
         postResponse.setUpVote(this.checkVoteType(post, VoteType.UPVOTE));
-        postResponse.setUpVote(this.checkVoteType(post, VoteType.DOWNVOTE));
+        postResponse.setDownVote(this.checkVoteType(post, VoteType.DOWNVOTE));
         return postResponse;
     }
 
