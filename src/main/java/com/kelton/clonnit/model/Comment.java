@@ -3,6 +3,7 @@ package com.kelton.clonnit.model;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 public class Comment {
@@ -18,7 +19,7 @@ public class Comment {
 	@JoinColumn(name = "post_id", referencedColumnName = "id")
 	private Post post;
 
-	private LocalDateTime createdDate;
+	private Date createdDate = new Date();
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "clonnitor_id", referencedColumnName = "id")
@@ -27,7 +28,7 @@ public class Comment {
 	public Comment() {
 	}
 
-	public Comment(Long id, String text, Post post, LocalDateTime createdDate, Clonnitor clonnitor) {
+	public Comment(Long id, String text, Post post, Date createdDate, Clonnitor clonnitor) {
 		this.id = id;
 		this.text = text;
 		this.post = post;
@@ -59,11 +60,11 @@ public class Comment {
 		this.post = post;
 	}
 
-	public LocalDateTime getCreatedDate() {
+	public Date getCreatedDate() {
 		return createdDate;
 	}
 
-	public void setCreatedDate(LocalDateTime createdDate) {
+	public void setCreatedDate(Date createdDate) {
 		this.createdDate = createdDate;
 	}
 
