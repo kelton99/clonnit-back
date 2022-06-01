@@ -2,6 +2,7 @@ package com.kelton.clonnit.service;
 
 import com.kelton.clonnit.dto.AuthenticationResponse;
 import com.kelton.clonnit.dto.LoginRequest;
+import com.kelton.clonnit.dto.RefreshTokenRequest;
 import com.kelton.clonnit.dto.RegisterRequest;
 import com.kelton.clonnit.exception.ClonnitException;
 import com.kelton.clonnit.model.Clonnitor;
@@ -20,6 +21,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -33,14 +35,16 @@ public class AuthService {
 
 	private final JwtProvider jwtProvider;
 	private final MailService mailService;
+	private final RefreshTokenService refreshTokenService;
 
-	public AuthService(PasswordEncoder passwordEncoder, ClonnitorRepository clonnitorRepository, VerificationTokenRepository verificationTokenRepository, AuthenticationManager authenticationManager, JwtProvider jwtProvider, MailService mailService) {
+	public AuthService(PasswordEncoder passwordEncoder, ClonnitorRepository clonnitorRepository, VerificationTokenRepository verificationTokenRepository, AuthenticationManager authenticationManager, JwtProvider jwtProvider, MailService mailService, RefreshTokenService refreshTokenService) {
 		this.passwordEncoder = passwordEncoder;
 		this.clonnitorRepository = clonnitorRepository;
 		this.verificationTokenRepository = verificationTokenRepository;
 		this.authenticationManager = authenticationManager;
 		this.jwtProvider = jwtProvider;
 		this.mailService = mailService;
+		this.refreshTokenService = refreshTokenService;
 	}
 
 	@Transactional
@@ -102,11 +106,28 @@ public class AuthService {
 		SecurityContextHolder.getContext().setAuthentication(authenticate);
 		String token = jwtProvider.generateToken(authenticate);
 
-		return new AuthenticationResponse(token, loginRequest.getUsername());
+		return new AuthenticationResponse(token,
+				refreshTokenService.generateRefreshToken().getToken(),
+				Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()),
+				loginRequest.getUsername()
+		);
+	}
+
+	public AuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
+		refreshTokenService.validateRefreshToken(refreshTokenRequest.getRefreshToken());
+		final String token = jwtProvider.generateTokenWithUserName(refreshTokenRequest.getUsername());
+		final AuthenticationResponse authenticationResponse = new AuthenticationResponse();
+		authenticationResponse.setAuthenticationToken(token);
+		authenticationResponse.setRefreshToken(refreshTokenRequest.getRefreshToken());
+		authenticationResponse.setExpiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()));
+		authenticationResponse.setUsername(refreshTokenRequest.getUsername());
+		return authenticationResponse;
 	}
 
 	public boolean isLoggedIn() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		return !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
 	}
+
+
 }
