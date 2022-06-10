@@ -4,6 +4,7 @@ import com.kelton.clonnit.dto.PostRequest;
 import com.kelton.clonnit.dto.PostResponse;
 import com.kelton.clonnit.exception.ClonnitException;
 import com.kelton.clonnit.model.*;
+import com.kelton.clonnit.repository.CommentRepository;
 import com.kelton.clonnit.repository.PostRepository;
 import com.kelton.clonnit.repository.SubclonnitRepository;
 import com.kelton.clonnit.repository.VoteRepository;
@@ -22,12 +23,14 @@ public class PostService {
     private final AuthService authService;
     private final VoteRepository voteRepository;
     private final SubclonnitRepository subclonnitRepository;
+    private final CommentRepository commentRepository;
 
-    public PostService(PostRepository postRepository, AuthService authService, VoteRepository voteRepository, SubclonnitRepository subclonnitRepository) {
+    public PostService(PostRepository postRepository, AuthService authService, VoteRepository voteRepository, SubclonnitRepository subclonnitRepository, CommentRepository commentRepository) {
         this.postRepository = postRepository;
         this.authService = authService;
         this.voteRepository = voteRepository;
         this.subclonnitRepository = subclonnitRepository;
+        this.commentRepository = commentRepository;
     }
 
     @Transactional(readOnly = true)
@@ -44,7 +47,8 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public List<PostResponse> getPostsBySubclonnit(Long id) {
-        List<Post> posts = postRepository.findAllBySubclonnit_Id(id);
+        final Subclonnit subclonnit = subclonnitRepository.findById(id).get();
+        List<Post> posts = postRepository.findAllBySubclonnit(subclonnit);
         return posts.stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
@@ -71,13 +75,16 @@ public class PostService {
         postResponse.setVoteCount(post.getVoteCount());
         postResponse.setSubclonnitName(post.getSubclonnit().getName());
         postResponse.setUsername(post.getClonnitor().getUsername());
-        postResponse.setCommentCount(post.getComments().size());
+        postResponse.setCommentCount(this.getCommentCount(post));
         //postResponse.setDuration(TimeAgo.using(post.getCreatedDate().getTime()));
         postResponse.setUpVote(this.checkVoteType(post, VoteType.UPVOTE));
         postResponse.setDownVote(this.checkVoteType(post, VoteType.DOWNVOTE));
         return postResponse;
     }
 
+    private Integer getCommentCount(Post post) {
+        return commentRepository.findByPost(post).size();
+    }
     private Post dtoToPost(PostRequest postRequest, Subclonnit subclonnit, Clonnitor clonnitor) {
         final Post post = new Post();
         post.setCreatedDate(new Date());

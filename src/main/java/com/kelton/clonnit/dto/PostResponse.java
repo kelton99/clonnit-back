@@ -10,7 +10,6 @@ public class PostResponse {
     private String subclonnitName;
     private Integer voteCount;
     private Integer commentCount;
-
     private String duration;
     private boolean upVote;
     private boolean downVote;

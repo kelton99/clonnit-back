@@ -79,8 +79,10 @@ public class CommentService {
 
     private CommentsDto mapToDto(Comment comment) {
         final CommentsDto commentsDto = new CommentsDto();
+        commentsDto.setId(comment.getId());
         commentsDto.setPostId(comment.getPost().getId());
         commentsDto.setUsername(comment.getClonnitor().getUsername());
+        commentsDto.setText(comment.getText());
         return commentsDto;
     }
 }

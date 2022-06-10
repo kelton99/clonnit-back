@@ -25,9 +25,6 @@ public class Post {
 	@Lob
 	private String description;
 
-	@OneToMany
-	private List<Comment> comments = new ArrayList<>();
-
 	private Integer voteCount;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -43,24 +40,15 @@ public class Post {
 	public Post() {
 	}
 
-	public Post(Long id, String postName, @Nullable String url, @Nullable String description, List<Comment> comments, Integer voteCount, Clonnitor clonnitor, Date createdDate, Subclonnit subclonnit) {
+	public Post(Long id, String postName, @Nullable String url, @Nullable String description, Integer voteCount, Clonnitor clonnitor, Date createdDate, Subclonnit subclonnit) {
 		this.id = id;
 		this.postName = postName;
 		this.url = url;
 		this.description = description;
-		this.comments = comments;
 		this.voteCount = voteCount;
 		this.clonnitor = clonnitor;
 		this.createdDate = createdDate;
 		this.subclonnit = subclonnit;
-	}
-
-	public List<Comment> getComments() {
-		return comments;
-	}
-
-	public void setComments(List<Comment> comments) {
-		this.comments = comments;
 	}
 
 	public Long getId() {

@@ -18,9 +18,6 @@ public class Subclonnit {
 	@NotBlank(message = "Description is required")
 	private String description;
 
-	@OneToMany(fetch = FetchType.LAZY)
-	private List<Post> posts;
-
 	private Date createdDate = new Date();
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -30,11 +27,10 @@ public class Subclonnit {
 	public Subclonnit() {
 	}
 
-	public Subclonnit(Long id, String name, String description, List<Post> posts, Date createdDate, Clonnitor creator) {
+	public Subclonnit(Long id, String name, String description, Date createdDate, Clonnitor creator) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
-		this.posts = posts;
 		this.createdDate = createdDate;
 		this.creator = creator;
 	}
@@ -61,14 +57,6 @@ public class Subclonnit {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public List<Post> getPosts() {
-		return posts;
-	}
-
-	public void setPosts(List<Post> posts) {
-		this.posts = posts;
 	}
 
 	public Date getCreatedDate() {
