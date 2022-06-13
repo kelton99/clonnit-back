@@ -1,5 +1,7 @@
 package com.kelton.clonnit.dto;
 
+import java.util.Objects;
+
 public class PostResponse {
 
     private Long id;
@@ -117,5 +119,18 @@ public class PostResponse {
 
     public void setDownVote(boolean downVote) {
         this.downVote = downVote;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PostResponse that = (PostResponse) o;
+        return id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

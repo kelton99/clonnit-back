@@ -66,7 +66,10 @@ public class PostService {
         return this.mapToDto(post);
     }
 
-    private PostResponse mapToDto(Post post) {
+    public PostResponse mapToDto(Post post) {
+        if(post == null)
+            return null;
+
         final PostResponse postResponse = new PostResponse();
         postResponse.setId(post.getId());
         postResponse.setPostName(post.getPostName());
@@ -85,7 +88,7 @@ public class PostService {
     private Integer getCommentCount(Post post) {
         return commentRepository.findByPost(post).size();
     }
-    private Post dtoToPost(PostRequest postRequest, Subclonnit subclonnit, Clonnitor clonnitor) {
+    public Post dtoToPost(PostRequest postRequest, Subclonnit subclonnit, Clonnitor clonnitor) {
         final Post post = new Post();
         post.setCreatedDate(new Date());
         post.setDescription(postRequest.getDescription());
