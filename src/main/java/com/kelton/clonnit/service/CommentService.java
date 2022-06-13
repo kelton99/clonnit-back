@@ -4,7 +4,6 @@ import com.kelton.clonnit.dto.CommentsDto;
 import com.kelton.clonnit.exception.ClonnitException;
 import com.kelton.clonnit.model.Clonnitor;
 import com.kelton.clonnit.model.Comment;
-import com.kelton.clonnit.model.NotificationEmail;
 import com.kelton.clonnit.model.Post;
 import com.kelton.clonnit.repository.ClonnitorRepository;
 import com.kelton.clonnit.repository.CommentRepository;
@@ -22,17 +21,11 @@ public class CommentService {
     private final PostRepository postRepository;
     private final AuthService authService;
 
-    private final MailContentBuilder mailContentBuilder;
-    private final MailService mailService;
-
-
-    public CommentService(CommentRepository commentRepository, ClonnitorRepository clonnitorRepository, PostRepository postRepository, AuthService authService, MailContentBuilder mailContentBuilder, MailService mailService) {
+    public CommentService(CommentRepository commentRepository, ClonnitorRepository clonnitorRepository, PostRepository postRepository, AuthService authService) {
         this.commentRepository = commentRepository;
         this.clonnitorRepository = clonnitorRepository;
         this.postRepository = postRepository;
         this.authService = authService;
-        this.mailContentBuilder = mailContentBuilder;
-        this.mailService = mailService;
     }
 
     public void save(CommentsDto commentsDto) {
@@ -40,9 +33,6 @@ public class CommentService {
                 .orElseThrow(() -> new ClonnitException(commentsDto.getPostId().toString()));
         final Comment comment = this.map(commentsDto, post, authService.getCurrentUser());
         commentRepository.save(comment);
-        
-        final String message = mailContentBuilder.build(post.getClonnitor().getUsername() + "posted a comment on your post");
-        sendCommentNotification(message, post.getClonnitor());
     }
 
     public List<CommentsDto> getAllCommentsForPost(Long postId) {
@@ -60,11 +50,6 @@ public class CommentService {
                 .stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
-    }
-
-    private void sendCommentNotification(String message, Clonnitor clonnitor) {
-        mailService.sendMail(new NotificationEmail(clonnitor.getUsername() + " Commented on your post",
-                clonnitor.getEmail(), message));
     }
 
     private Comment map(CommentsDto commentsDto, Post post, Clonnitor currentUser) {
