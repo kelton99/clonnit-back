@@ -6,11 +6,11 @@ import com.kelton.clonnit.dto.RefreshTokenRequest;
 import com.kelton.clonnit.dto.RegisterRequest;
 import com.kelton.clonnit.service.AuthService;
 import com.kelton.clonnit.service.RefreshTokenService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 
 
 @RestController

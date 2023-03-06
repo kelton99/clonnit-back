@@ -73,7 +73,6 @@ public class PostService {
         final PostResponse postResponse = new PostResponse();
         postResponse.setId(post.getId());
         postResponse.setPostName(post.getPostName());
-        postResponse.setUrl(post.getUrl());
         postResponse.setDescription(post.getDescription());
         postResponse.setVoteCount(post.getVoteCount());
         postResponse.setSubclonnitName(post.getSubclonnit().getName());

@@ -3,9 +3,9 @@ package com.kelton.clonnit.service;
 import com.kelton.clonnit.exception.ClonnitException;
 import com.kelton.clonnit.model.RefreshToken;
 import com.kelton.clonnit.repository.RefreshTokenRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.time.Instant;
 import java.util.UUID;
 

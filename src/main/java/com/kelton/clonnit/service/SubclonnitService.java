@@ -5,9 +5,9 @@ import com.kelton.clonnit.exception.ClonnitException;
 import com.kelton.clonnit.model.Subclonnit;
 import com.kelton.clonnit.repository.PostRepository;
 import com.kelton.clonnit.repository.SubclonnitRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 

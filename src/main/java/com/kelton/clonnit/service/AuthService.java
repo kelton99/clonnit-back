@@ -8,6 +8,7 @@ import com.kelton.clonnit.exception.ClonnitException;
 import com.kelton.clonnit.model.Clonnitor;
 import com.kelton.clonnit.repository.ClonnitorRepository;
 import com.kelton.clonnit.security.JwtProvider;
+import jakarta.transaction.Transactional;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,7 +18,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.time.Instant;
 import java.time.LocalDateTime;
 

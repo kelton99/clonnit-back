@@ -1,33 +1,18 @@
 package com.kelton.clonnit.dto;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class RefreshTokenRequest {
 
     @NotBlank
     private String refreshToken;
     private String username;
-
-    public RefreshTokenRequest() { }
-
-    public RefreshTokenRequest(String refreshToken, String username) {
-        this.refreshToken = refreshToken;
-        this.username = username;
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
 }
