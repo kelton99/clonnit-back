@@ -28,11 +28,11 @@ public class CommentService {
         this.authService = authService;
     }
 
-    public void save(CommentsDto commentsDto) {
+    public CommentsDto save(CommentsDto commentsDto) {
         final Post post = postRepository.findById(commentsDto.getPostId())
                 .orElseThrow(() -> new ClonnitException(commentsDto.getPostId().toString()));
         final Comment comment = this.map(commentsDto, post, authService.getCurrentUser());
-        commentRepository.save(comment);
+        return this.mapToDto(commentRepository.save(comment));
     }
 
     public List<CommentsDto> getAllCommentsForPost(Long postId) {

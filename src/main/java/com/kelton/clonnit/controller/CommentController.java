@@ -19,9 +19,8 @@ public class CommentController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createComment(@RequestBody CommentsDto commentsDto) {
-        commentService.save(commentsDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<CommentsDto> createComment(@RequestBody CommentsDto commentsDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.save(commentsDto));
     }
 
     @GetMapping("/by-post/{postId}")
