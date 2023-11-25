@@ -1,6 +1,5 @@
 package com.kelton.clonnit.controller;
 
-import com.kelton.clonnit.dto.CommentsDto;
 import com.kelton.clonnit.dto.PostRequest;
 import com.kelton.clonnit.dto.PostResponse;
 import com.kelton.clonnit.service.PostService;
