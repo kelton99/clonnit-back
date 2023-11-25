@@ -66,9 +66,22 @@ public class PostService {
         return this.mapToDto(post);
     }
 
+    @Transactional
+    public void deletePostById(final Long id) {
+        final Post post =  postRepository.findById(id).orElseThrow(() -> new ClonnitException(id.toString()));
+        final Clonnitor clonnitor = this.authService.getCurrentUser();
+        if (!post.getClonnitor().getId().equals(clonnitor.getId())) {
+            throw new ClonnitException(id.toString());
+        }
+        this.commentRepository.deleteAllByPost(post);
+        this.voteRepository.deleteAllByPost(post);
+        this.postRepository.deleteById(id);
+    }
+
     public PostResponse mapToDto(Post post) {
-        if(post == null)
+        if(post == null) {
             return null;
+        }
 
         final PostResponse postResponse = new PostResponse();
         postResponse.setId(post.getId());
@@ -78,7 +91,6 @@ public class PostService {
         postResponse.setSubclonnitName(post.getSubclonnit().getName());
         postResponse.setUsername(post.getClonnitor().getUsername());
         postResponse.setCommentCount(this.getCommentCount(post));
-        //postResponse.setDuration(TimeAgo.using(post.getCreatedDate().getTime()));
         postResponse.setUpVote(this.checkVoteType(post, VoteType.UPVOTE));
         postResponse.setDownVote(this.checkVoteType(post, VoteType.DOWNVOTE));
         return postResponse;

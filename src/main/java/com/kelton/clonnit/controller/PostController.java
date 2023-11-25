@@ -1,5 +1,6 @@
 package com.kelton.clonnit.controller;
 
+import com.kelton.clonnit.dto.CommentsDto;
 import com.kelton.clonnit.dto.PostRequest;
 import com.kelton.clonnit.dto.PostResponse;
 import com.kelton.clonnit.service.PostService;
@@ -42,5 +43,11 @@ public class PostController {
     @PostMapping
     public ResponseEntity<PostResponse> createPost(@RequestBody PostRequest postRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(postService.save(postRequest));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<PostResponse> deletePost(@PathVariable Long id) {
+        this.postService.deletePostById(id);
+        return ResponseEntity.noContent().build();
     }
 }

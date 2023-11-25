@@ -44,6 +44,10 @@ public class VoteService {
         postRepository.save(post);
     }
 
+    public void deleteAllVotesByPost(Post post) {
+        this.voteRepository.deleteAllByPost(post);
+    }
+
     private Vote mapToVote(VoteDto voteDto, Post post) {
         final Vote vote = new Vote();
         vote.setVoteType(voteDto.getVoteType());

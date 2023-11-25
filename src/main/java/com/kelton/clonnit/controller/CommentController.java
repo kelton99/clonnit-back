@@ -32,4 +32,10 @@ public class CommentController {
     public ResponseEntity<List<CommentsDto>> getAllCommentsForUser(@PathVariable String username) {
         return ResponseEntity.status(HttpStatus.OK).body(commentService.getAllCommentsForClonnitor(username));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<CommentsDto> deleteComment(@PathVariable Long id) {
+        this.commentService.deleteCommentById(id);
+        return ResponseEntity.noContent().build();
+    }
 }

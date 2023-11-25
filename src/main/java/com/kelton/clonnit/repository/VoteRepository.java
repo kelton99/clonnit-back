@@ -12,4 +12,6 @@ import java.util.Optional;
 public interface VoteRepository extends JpaRepository<Vote, Long> {
 
     Optional<Vote> findTopByPostAndClonnitorOrderByIdDesc(Post post, Clonnitor clonnitor);
+
+    void deleteAllByPost(Post post);
 }

@@ -44,12 +44,25 @@ public class CommentService {
     }
 
     public List<CommentsDto> getAllCommentsForClonnitor(String username) {
-        Clonnitor clonnitor = clonnitorRepository.findByUsername(username)
+        final Clonnitor clonnitor = clonnitorRepository.findByUsername(username)
                 .orElseThrow(() -> new ClonnitException(username));
         return commentRepository.findAllByClonnitor(clonnitor)
                 .stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
+    }
+
+    public void deleteCommentById(final Long id) {
+        final Comment comment =  commentRepository.findById(id).orElseThrow(() -> new ClonnitException(id.toString()));
+        final Clonnitor clonnitor = this.authService.getCurrentUser();
+        if (!comment.getClonnitor().getId().equals(clonnitor.getId())) {
+            throw new ClonnitException(id.toString());
+        }
+        this.commentRepository.deleteById(id);
+    }
+
+    public void deleteAllCommentByPost(final Post post) {
+        this.commentRepository.deleteAllByPost(post);
     }
 
     private Comment map(CommentsDto commentsDto, Post post, Clonnitor currentUser) {
