@@ -3,10 +3,7 @@ package com.kelton.clonnit.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
@@ -15,6 +12,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class Subclonnit {
 
 	@Id
@@ -27,11 +25,13 @@ public class Subclonnit {
 	@NotBlank(message = "Description is required")
 	private String description;
 
-	private Date createdDate = new Date();
+	private Date createdDate;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "clonnitor_id", referencedColumnName = "id")
 	private Clonnitor creator;
+
+	private Integer numberOfPosts;
 
 	@Override
 	public boolean equals(Object o) {

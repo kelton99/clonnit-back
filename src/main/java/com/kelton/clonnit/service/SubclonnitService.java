@@ -1,62 +1,50 @@
 package com.kelton.clonnit.service;
 
-import com.kelton.clonnit.dto.SubclonnitDto;
+import com.kelton.clonnit.dto.SubclonnitRequest;
+import com.kelton.clonnit.dto.SubclonnitResponse;
 import com.kelton.clonnit.exception.ClonnitException;
-import com.kelton.clonnit.model.Subclonnit;
-import com.kelton.clonnit.repository.PostRepository;
 import com.kelton.clonnit.repository.SubclonnitRepository;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class SubclonnitService {
 
     private final SubclonnitRepository subclonnitRepository;
-    private final PostRepository postRepository;
 
-    public SubclonnitService(SubclonnitRepository subclonnitRepository, PostRepository postRepository) {
-        this.subclonnitRepository = subclonnitRepository;
-        this.postRepository = postRepository;
-    }
 
-    public SubclonnitDto save(SubclonnitDto subclonnitDto) {
-        Subclonnit saved = mapSubclonnitDto(subclonnitDto);
-        saved = subclonnitRepository.save(saved);
-        subclonnitDto.setId(saved.getId());
-        return subclonnitDto;
+    public SubclonnitResponse save(SubclonnitRequest subclonnitRequest) {
+        final var subclonnitEntity = subclonnitRepository.save(SubclonnitRequest.mapToSubclonnit(subclonnitRequest));
+        return new SubclonnitResponse(subclonnitEntity);
     }
 
     @Transactional
-    public List<SubclonnitDto> getAll() {
-        return subclonnitRepository.findAll().stream().map(this::mapToDto).collect(Collectors.toList());
+    public List<SubclonnitResponse> getAll() {
+        return subclonnitRepository.findAll().stream().map(SubclonnitResponse::new).collect(Collectors.toList());
     }
 
     @Transactional
-    public SubclonnitDto getSubclonnit(Long id) {
-        final Subclonnit subclonnit = subclonnitRepository.findById(id)
+    public SubclonnitResponse getSubclonnit(Long id) {
+        final var subclonnit = subclonnitRepository.findById(id)
                 .orElseThrow(() -> new ClonnitException("No subclonnit found with that id"));
-        return this.mapToDto(subclonnit);
-    }
-
-    private SubclonnitDto mapToDto(Subclonnit subclonnit) {
-        final SubclonnitDto subclonnitDto = new SubclonnitDto();
-        final Integer numberOfPost = postRepository.findAllBySubclonnit(subclonnit).size();
-        subclonnitDto.setId(subclonnit.getId());
-        subclonnitDto.setName(subclonnit.getName());
-        subclonnitDto.setNumberOfPosts(numberOfPost);
-        subclonnitDto.setDescription(subclonnit.getDescription());
-        return subclonnitDto;
-    }
-
-    private Subclonnit mapSubclonnitDto(SubclonnitDto subclonnitDto) {
-        final Subclonnit subclonnit = new Subclonnit();
-        subclonnit.setName(subclonnitDto.getName());
-        subclonnit.setDescription(subclonnitDto.getDescription());
-        return subclonnit;
+        return new SubclonnitResponse(subclonnit);
     }
 
 
+    public void increasePostCount(Long subclonnitId) {
+        final var subclonnit = SubclonnitResponse.mapToSubclonnit(this.getSubclonnit(subclonnitId));
+        subclonnit.setNumberOfPosts(subclonnit.getNumberOfPosts() + 1);
+        this.subclonnitRepository.save(subclonnit);
+    }
+
+    public void decreasePostCount(Long subclonnitId) {
+        final var subclonnit = SubclonnitResponse.mapToSubclonnit(this.getSubclonnit(subclonnitId));
+        subclonnit.setNumberOfPosts(subclonnit.getNumberOfPosts() - 1);
+        this.subclonnitRepository.save(subclonnit);
+    }
 }

@@ -41,6 +41,8 @@ public class Post {
 	@JoinColumn(name = "subclonnit_id", referencedColumnName = "id")
 	private Subclonnit subclonnit;
 
+	//private Integer commentCount;
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

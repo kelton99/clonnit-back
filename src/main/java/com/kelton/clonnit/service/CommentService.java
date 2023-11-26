@@ -8,12 +8,14 @@ import com.kelton.clonnit.model.Post;
 import com.kelton.clonnit.repository.ClonnitorRepository;
 import com.kelton.clonnit.repository.CommentRepository;
 import com.kelton.clonnit.repository.PostRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class CommentService {
 
     private final CommentRepository commentRepository;
@@ -21,21 +23,16 @@ public class CommentService {
     private final PostRepository postRepository;
     private final AuthService authService;
 
-    public CommentService(CommentRepository commentRepository, ClonnitorRepository clonnitorRepository, PostRepository postRepository, AuthService authService) {
-        this.commentRepository = commentRepository;
-        this.clonnitorRepository = clonnitorRepository;
-        this.postRepository = postRepository;
-        this.authService = authService;
-    }
 
-    public CommentsDto save(CommentsDto commentsDto) {
+    public CommentsDto save(final CommentsDto commentsDto) {
         final Post post = postRepository.findById(commentsDto.getPostId())
                 .orElseThrow(() -> new ClonnitException(commentsDto.getPostId().toString()));
         final Comment comment = this.map(commentsDto, post, authService.getCurrentUser());
+        //this.postService.increaseCommentCount(post.getId());
         return this.mapToDto(commentRepository.save(comment));
     }
 
-    public List<CommentsDto> getAllCommentsForPost(Long postId) {
+    public List<CommentsDto> getAllCommentsForPost(final Long postId) {
         final Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ClonnitException(postId.toString()));
         return commentRepository.findByPost(post)
@@ -43,7 +40,7 @@ public class CommentService {
                 .map(this::mapToDto).collect(Collectors.toList());
     }
 
-    public List<CommentsDto> getAllCommentsForClonnitor(String username) {
+    public List<CommentsDto> getAllCommentsForClonnitor(final String username) {
         final Clonnitor clonnitor = clonnitorRepository.findByUsername(username)
                 .orElseThrow(() -> new ClonnitException(username));
         return commentRepository.findAllByClonnitor(clonnitor)
@@ -58,6 +55,7 @@ public class CommentService {
         if (!comment.getClonnitor().getId().equals(clonnitor.getId())) {
             throw new ClonnitException(id.toString());
         }
+        //this.postService.decreaseCommentCount(comment.getPost().getId());
         this.commentRepository.deleteById(id);
     }
 
@@ -82,5 +80,9 @@ public class CommentService {
         commentsDto.setUsername(comment.getClonnitor().getUsername());
         commentsDto.setText(comment.getText());
         return commentsDto;
+    }
+
+    public Integer getCommentCount(final Long id) {
+        return this.commentRepository.countByPostId(id);
     }
 }

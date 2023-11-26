@@ -7,23 +7,19 @@ import com.kelton.clonnit.model.Vote;
 import com.kelton.clonnit.model.VoteType;
 import com.kelton.clonnit.repository.PostRepository;
 import com.kelton.clonnit.repository.VoteRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class VoteService {
 
     private final VoteRepository voteRepository;
     private final PostRepository postRepository;
     private final AuthService authService;
-
-    public VoteService(VoteRepository voteRepository, PostRepository postRepository, AuthService authService) {
-        this.voteRepository = voteRepository;
-        this.postRepository = postRepository;
-        this.authService = authService;
-    }
 
     @Transactional
     public void vote(VoteDto voteDto) {

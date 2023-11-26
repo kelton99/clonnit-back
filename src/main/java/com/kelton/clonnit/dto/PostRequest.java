@@ -11,8 +11,7 @@ import lombok.Setter;
 @Setter
 public class PostRequest {
 
-    private Long postId;
-    private String subclonnitName;
+    private Long subclonnitId;
     private String postName;
     private String description;
 }

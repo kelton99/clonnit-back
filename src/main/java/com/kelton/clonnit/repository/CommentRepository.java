@@ -15,4 +15,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findAllByClonnitor(Clonnitor clonnitor);
 
     void deleteAllByPost(Post post);
+
+    Integer countByPostId(Long id);
 }

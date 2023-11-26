@@ -2,12 +2,15 @@ package com.kelton.clonnit.service;
 
 import com.kelton.clonnit.dto.PostRequest;
 import com.kelton.clonnit.dto.PostResponse;
+import com.kelton.clonnit.dto.SubclonnitResponse;
 import com.kelton.clonnit.exception.ClonnitException;
-import com.kelton.clonnit.model.*;
-import com.kelton.clonnit.repository.CommentRepository;
+import com.kelton.clonnit.model.Clonnitor;
+import com.kelton.clonnit.model.Post;
+import com.kelton.clonnit.model.Vote;
+import com.kelton.clonnit.model.VoteType;
 import com.kelton.clonnit.repository.PostRepository;
-import com.kelton.clonnit.repository.SubclonnitRepository;
 import com.kelton.clonnit.repository.VoteRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,21 +20,15 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;
     private final AuthService authService;
+    private final VoteService voteService;
+    private final SubclonnitService subclonnitService;
+    private final CommentService commentService;
     private final VoteRepository voteRepository;
-    private final SubclonnitRepository subclonnitRepository;
-    private final CommentRepository commentRepository;
-
-    public PostService(PostRepository postRepository, AuthService authService, VoteRepository voteRepository, SubclonnitRepository subclonnitRepository, CommentRepository commentRepository) {
-        this.postRepository = postRepository;
-        this.authService = authService;
-        this.voteRepository = voteRepository;
-        this.subclonnitRepository = subclonnitRepository;
-        this.commentRepository = commentRepository;
-    }
 
     @Transactional(readOnly = true)
     public List<PostResponse> getAll() {
@@ -39,47 +36,50 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PostResponse getPost(Long id) {
-        final Post post = postRepository.findById(id)
+    public PostResponse getPost(final Long id) {
+        final var post = postRepository.findById(id)
                 .orElseThrow(() -> new ClonnitException("Post not found"));
         return this.mapToDto(post);
     }
 
     @Transactional(readOnly = true)
-    public List<PostResponse> getPostsBySubclonnit(Long id) {
-        final Subclonnit subclonnit = subclonnitRepository.findById(id).get();
-        List<Post> posts = postRepository.findAllBySubclonnit(subclonnit);
+    public List<PostResponse> getPostsBySubclonnit(final Long id) {
+        final var posts = postRepository.findAllBySubclonnitId(id);
         return posts.stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public List<PostResponse> getPostsByUsername(String username) {
-        List<Post> posts = postRepository.findAllByClonnitor_Username(username);
+    public List<PostResponse> getPostsByUsername(final String username) {
+        final var posts = postRepository.findAllByClonnitor_Username(username);
         return posts.stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
-    public PostResponse save(PostRequest postRequest) {
-        final Subclonnit subclonnit = subclonnitRepository.findByName(postRequest.getSubclonnitName())
-                .orElseThrow(() -> new ClonnitException("Subclonnit not found"));
-        final Post post = this.dtoToPost(postRequest, subclonnit, authService.getCurrentUser());
-        postRepository.save(post);
-        return this.mapToDto(post);
+    @Transactional
+    public PostResponse save(final PostRequest postRequest) {
+        final var subclonnit = subclonnitService.getSubclonnit(postRequest.getSubclonnitId());
+        final var post = this.dtoToPost(postRequest, subclonnit, authService.getCurrentUser());
+        this.subclonnitService.increasePostCount(postRequest.getSubclonnitId());
+        return this.mapToDto(postRepository.save(post));
     }
 
     @Transactional
     public void deletePostById(final Long id) {
-        final Post post =  postRepository.findById(id).orElseThrow(() -> new ClonnitException(id.toString()));
-        final Clonnitor clonnitor = this.authService.getCurrentUser();
+        final var post = postRepository.findById(id)
+                .orElseThrow(() -> new ClonnitException(id.toString()));
+        final var clonnitor = this.authService.getCurrentUser();
+
         if (!post.getClonnitor().getId().equals(clonnitor.getId())) {
             throw new ClonnitException(id.toString());
         }
-        this.commentRepository.deleteAllByPost(post);
-        this.voteRepository.deleteAllByPost(post);
+
+        this.commentService.deleteAllCommentByPost(post);
+        this.voteService.deleteAllVotesByPost(post);
+        this.subclonnitService.decreasePostCount(post.getSubclonnit().getId());
         this.postRepository.deleteById(id);
     }
 
     public PostResponse mapToDto(Post post) {
-        if(post == null) {
+        if (post == null) {
             return null;
         }
 
@@ -90,27 +90,28 @@ public class PostService {
         postResponse.setVoteCount(post.getVoteCount());
         postResponse.setSubclonnitName(post.getSubclonnit().getName());
         postResponse.setUsername(post.getClonnitor().getUsername());
-        postResponse.setCommentCount(this.getCommentCount(post));
+        postResponse.setCommentCount(this.getCommentCount(post.getId()));
         postResponse.setUpVote(this.checkVoteType(post, VoteType.UPVOTE));
         postResponse.setDownVote(this.checkVoteType(post, VoteType.DOWNVOTE));
         return postResponse;
     }
 
-    private Integer getCommentCount(Post post) {
-        return commentRepository.findByPost(post).size();
+    private Integer getCommentCount(Long id) {
+        return commentService.getCommentCount(id);
     }
-    public Post dtoToPost(PostRequest postRequest, Subclonnit subclonnit, Clonnitor clonnitor) {
+
+    public Post dtoToPost(PostRequest postRequest, SubclonnitResponse subclonnitResponse, Clonnitor clonnitor) {
         final Post post = new Post();
         post.setCreatedDate(new Date());
         post.setDescription(postRequest.getDescription());
-        post.setSubclonnit(subclonnit);
+        post.setSubclonnit(SubclonnitResponse.mapToSubclonnit(subclonnitResponse));
         post.setPostName(postRequest.getPostName());
         post.setVoteCount(0);
         post.setClonnitor(clonnitor);
         return post;
     }
 
-    private boolean checkVoteType(Post post, VoteType voteType) {
+    public boolean checkVoteType(Post post, VoteType voteType) {
         if (authService.isLoggedIn()) {
             Optional<Vote> voteForPostByUser =
                     voteRepository.findTopByPostAndClonnitorOrderByIdDesc(post,
